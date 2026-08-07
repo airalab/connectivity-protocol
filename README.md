@@ -57,8 +57,8 @@
 
 ## Versioning
 
-Breaking schema changes go in a new folder/package (`proto/v2/`, `examples/v2/`, …).  
-There is no `schema_version` field inside `Message` — the path / `package sensors.social.codec.v1` is the version.
+Breaking schema changes go in a new folder/package (`v2/`, `v3/`, …).  
+There is no `schema_version` field inside `Message` — the path / `package sensors.social.v1` is the version.
 
 ## HTTP Transport Envelope
 
@@ -68,8 +68,6 @@ For sensors-connectivity integration, telemetry messages are wrapped in a `Signe
 - **`nonce`** — Random value to prevent replay attacks (e.g., UUID v4)
 - **`signature`** — Ed25519 signature over the canonical representation (base64-encoded)
 - **`message`** — The actual telemetry message (Message protobuf)
-
-See [sensors-connectivity](https://github.com/akagi-dev/sensors-connectivity/blob/main/docs/architecture/integration-guide.md) for complete details on HTTP transport, signature computation, and API endpoints.
 
 ## Encryption
 
@@ -116,8 +114,6 @@ Sensors can implement flexible privacy by:
 2. **Fully private**: Leave `public` empty, put all measurements in `protected` sections (ciphertext contains serialized UrbanProtected/InsightProtected)
 3. **Mixed sharing**: Share basic metrics publicly, detailed metrics in protected sections
 4. **Multiple recipients**: Create separate protected sections for different users/groups
-
-> The `EncryptedData` message follows the Robonomics CPS encryption format ([specification](https://github.com/airalab/robonomics/blob/master/frame/cps/README.md#-encryption-format)):
 
 ### Encryption Process
 
