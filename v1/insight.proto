@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package sensors.social.codec.v1;
+
+import "common.proto";
+
+// Insight (indoor) sensor telemetry.
+// Designed for indoor environmental monitoring, focusing on
+// climate comfort and air quality parameters.
+
+// Insight board sensors.
+// All fields are optional (proto3 semantics: 0/empty = not measured/not available).
+message Insight {
+  oneof sensor {
+    // Indoor air temperature in degrees Celsius
+    // Typical comfort range: 18-24°C
+    double temperature_c = 1;
+
+    // Relative humidity as percentage (0-100%)
+    // Typical comfort range: 30-60% RH
+    double humidity_pct = 2;
+
+    // Atmospheric pressure in Pascals
+    // Typical range: 95000-105000 Pa (950-1050 hPa)
+    // Note: Store raw Pascals; UI converts to mmHg (×0.00750062) if needed
+    double pressure_pa = 3;
+
+    // Carbon dioxide concentration in parts per million (ppm)
+    // Typical ranges: <400=Outdoor, 400-1000=Good, 1000-2000=Acceptable,
+    // >2000=Poor ventilation, >5000=Immediately hazardous
+    double co2_ppm = 4;
+  
+    // Geographic location
+    Location location = 5;
+  }
+}
+
+// Protected measurements, encrypted data serialized using this message 
+message InsightProtected {
+  // Protected measurements, used for encryption
+  repeated Insight protected = 1;
+}
+
+// Insight payload with public/protected data sharing.
+message InsightPayload {
+  // Public measurements visible to everyone
+  repeated Insight public = 1;
+
+  // Protected (encrypted) measurement sections, each for a different recipient
+  // Allows sharing different subsets of measurements with different users
+  repeated EncryptedData protected = 2;
+}

@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package sensors.social.codec.v1;
+
+// SignedEnvelope wraps telemetry messages with connectivity layer metadata.
+// This is the complete HTTP request body format for sensors-connectivity integration.
+// Based on: https://github.com/akagi-dev/sensors-connectivity/blob/main/docs/architecture/integration-guide.md#request-body-schema-normative
+
+// Signed envelope for HTTP transport.
+// Replaces JSON format with protobuf binary encoding.
+message SignedEnvelope {
+  // Sensor's Ed25519 public key (32 bytes).
+  // Used as unique device identifier.
+  // Note: In JSON encoded as base58 format (Robonomics SS58 address)
+  bytes sensor_id = 1;
+  
+  // Unix timestamp in milliseconds (UTC).
+  // When the measurement was taken.
+  // Note: In JSON encoded as ISO 8601 string (e.g., "2024-08-06T13:45:12.345Z")
+  uint64 timestamp = 2;
+  
+  // Random nonce to prevent replay attacks (16-32 bytes recommended).
+  // Should be unique for each request (e.g., random bytes or UUID bytes).
+  // Note: In JSON encoded as base64 format
+  bytes nonce = 3;
+  
+  // Ed25519 signature (64 bytes).
+  // Signs: sensor_id + timestamp + nonce + message.
+  // Note: In JSON encoded as base64 format
+  bytes signature = 4;
+  
+  // The actual telemetry message as raw protobuf bytes.
+  // Contains serialized Message (metadata + payload).
+  // Connectivity layer can pass this through without decoding.
+  // Note: In JSON encoded as base64 format
+  bytes message = 5;
+}

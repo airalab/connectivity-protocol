@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package sensors.social.codec.v1;
+
+// Common types shared across all message schemas.
+// Schema version: v1 (2024-08-06)
+
+// Non-measurement metadata.
+// Contains device ownership and attribution information, not sensor readings.
+message Meta {
+  // Sensor owner address.
+  // Used on the map for grouping sensors by owner.
+  // Note: In JSON encoded as base58 format (Robonomics SS58 address)
+  bytes owner = 1;
+}
+
+// GPS / map coordinates (shared by all sensor types).
+// Uses WGS84 datum for geographic positioning with optional elevation data.
+message Location {
+  // Latitude in decimal degrees, range: -90.0 to +90.0 (WGS84)
+  double lat = 1;
+  
+  // Longitude in decimal degrees, range: -180.0 to +180.0 (WGS84)
+  double lon = 2;
+  
+  // Height above mean sea level in meters (optional, 0 if not available)
+  double height_m = 3;
+}
+
+// Encrypted data following Robonomics CPS encryption format.
+// Uses AEAD (Authenticated Encryption with Associated Data) to ensure
+// confidentiality and integrity of sensor measurements.
+// Based on: https://github.com/airalab/robonomics/blob/master/frame/cps/README.md#-encryption-format
+message EncryptedData {
+  // Encryption protocol version (currently always 1)
+  uint32 version = 1;
+  
+  // Encryption algorithm identifier, one of:
+  // - "xchacha20": XChaCha20-Poly1305 (24-byte nonce, portable)
+  // - "aesgcm256": AES-256-GCM (12-byte nonce, hardware accelerated)
+  // - "chacha20": ChaCha20-Poly1305 (12-byte nonce, portable)
+  string algorithm = 2;
+  
+  // Sender's public key.
+  // Used for ECDH key agreement to derive the encryption key.
+  // Note: In JSON encoded as base58 format (Robonomics SS58 address)
+  bytes from = 3;
+  
+  // Random nonce/initialization vector:
+  // - XChaCha20: 24 bytes (192 bits)
+  // - AES-GCM/ChaCha20: 12 bytes (96 bits)
+  // Must be unique for each message encrypted with the same key.
+  // Note: In JSON encoded as base64 format
+  bytes nonce = 4;
+  
+  // AEAD ciphertext including the authentication tag.
+  // Contains the encrypted protobuf-serialized payload (UrbanProtected or InsightProtected)
+  // plus a 16-byte Poly1305/GCM authentication tag appended.
+  // Note: In JSON encoded as base64 format
+  bytes ciphertext = 5;
+}

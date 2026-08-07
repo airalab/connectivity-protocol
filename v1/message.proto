@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package sensors.social.codec.v1;
+
+import "common.proto";
+import "urban.proto";
+import "insight.proto";
+
+// Top-level message structure for connectivity / map
+// This is the root message type exchanged between firmware, connectivity layer,
+// and the sensors.social map infrastructure.
+//
+// For HTTP transport with connectivity layer, use SignedEnvelope (see envelope.proto).
+
+// Root telemetry message.
+// Contains metadata and device measurements.
+message Message {
+  // Metadata; does not contain measurement data.
+  Meta metadata = 1;
+  
+  // Device measurements.
+  oneof payload {
+    // Outdoor/urban environmental monitoring
+    UrbanPayload urban = 2;
+    
+    // Indoor environmental monitoring
+    InsightPayload insight = 3;
+  }
+}
