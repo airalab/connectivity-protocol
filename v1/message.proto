@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package sensors.social.codec.v1;
+package sensors.social.v1;
 
 import "common.proto";
 import "urban.proto";

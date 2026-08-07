@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package sensors.social.codec.v1;
+package sensors.social.v1;
 
 // Common types shared across all message schemas.
 // Schema version: v1 (2024-08-06)
