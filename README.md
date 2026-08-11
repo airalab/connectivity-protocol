@@ -183,6 +183,18 @@ Sensors can implement flexible privacy by:
   ✅ Use ChaCha20 for compatibility
 ```
 
+### Access Revocation
+
+Revocation only applies going forward.
+
+A protected section, once published, is stored in IPFS and its hash is anchored in the
+chain. A recipient who held the key keeps everything they were able to decrypt up to the
+moment access was taken back. Rotating keys or dropping a recipient from future messages
+withdraws access to what comes next — not to what has already been released.
+
+Applications built on this format should present the distinction to the user, rather than
+implying that sharing can be undone.
+
 ## Partial Decoding
 
 Protobuf supports **zero-copy pass-through** at the connectivity layer:
