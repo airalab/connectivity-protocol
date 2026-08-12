@@ -9,9 +9,9 @@
 
 ```
 ┌────────────┐                ┌─────────────────┐              ┌─────────────────┐
-│  IoT       │   Signed       │  Connectivity   │   Raw        │  Backend/Map    │
+│  IoT       │   Signed       │  Connectivity   │              │  Backend/Map    │
 │  Sensor    │──────────────> │  Layer          │────────────> │  Infrastructure │
-│  Device    │   Envelope     │  (Pass-through) │   Message    │                 │
+│  Device    │   Envelope     │  (Pass-through) │              │                 │
 └────────────┘                └─────────────────┘              └─────────────────┘
      │                              │                                  │
      │ Measures                     │ Validates                        │ Decodes
@@ -60,14 +60,14 @@
 Breaking schema changes go in a new folder/package (`v2/`, `v3/`, …).  
 There is no `schema_version` field inside `Message` — the path / `package sensors.social.v1` is the version.
 
-## HTTP Transport Envelope
+## Signed Envelope
 
-For sensors-connectivity integration, telemetry messages are wrapped in a `SignedEnvelope` that provides:
+Telemetry message wrapped in a `SignedEnvelope` that provides:
 - **`sensor_id`** — Unique device identifier (persistent across restarts)
 - **`timestamp`** — UTC timestamp when measurement was taken (ISO 8601 format)
 - **`nonce`** — Random value to prevent replay attacks (e.g., UUID v4)
-- **`signature`** — Ed25519 signature over the canonical representation (base64-encoded)
-- **`message`** — The actual telemetry message (Message protobuf)
+- **`signature`** — Ed25519 signature
+- **`message`** — The actual measurements data
 
 ## Encryption
 
@@ -176,11 +176,9 @@ Sensors can implement flexible privacy by:
 ```
   AES-GCM-256 (Hardware)  ████████████████████████████  2-3 GB/s
   XChaCha20-Poly1305      ██████                        ~600 MB/s
-  ChaCha20-Poly1305       ██████                        ~600 MB/s
   
-  ✅ Use AES-GCM on servers with AES-NI
-  ✅ Use XChaCha20 on MCUs and mobile devices
-  ✅ Use ChaCha20 for compatibility
+  ✅ Use AES-GCM on devices with hardware acceleration
+  ✅ Use XChaCha20 on MCUs / mobile devices
 ```
 
 ### Access Revocation
@@ -218,7 +216,7 @@ Protobuf supports **zero-copy pass-through** at the connectivity layer:
 │  ┌────────────────────────────────────────────┐                     │
 │  │ 1. Verify Ed25519 signature    ✓           │                     │
 │  │ 2. Check timestamp freshness   ✓           │                     │
-│  │ 3. Forward raw bytes           →           │  (No parsing!)      │
+│  │ 3. Forward envelop             →           │  (No parsing!)      │
 │  │                                            │                     │
 │  │ ❌ Does NOT decode Message                 │                     │
 │  │ ❌ Does NOT parse measurements             │                     │
@@ -237,10 +235,3 @@ Protobuf supports **zero-copy pass-through** at the connectivity layer:
 │                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 ```
-
-### Benefits
-
-- **No CPU overhead** at connectivity layer (no protobuf parsing)
-- **No schema dependency** — connectivity layer doesn't need Message proto definitions
-- **Fast routing** — signature validation only, no message inspection
-- **Future-proof** — new measurement types work without connectivity layer updates
