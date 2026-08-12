@@ -86,18 +86,6 @@ Telemetry message wrapped in a `SignedEnvelope` that provides:
 | **Backend** | Deserialize for indexing, store original bytes | ✅ |
 | **Any layer** | Decode `message` + re-encode | ❌ **Breaks signature & CID** |
 
-### Verification
-
-If you must test serialization code:
-
-```bash
-# Signature validation is the primary check
-verify_ed25519(envelope.signature, envelope.message, device_pubkey)
-# ✅ Pass = bytes unchanged
-# ❌ Fail = bytes were modified (re-encoded)
-```
-
-**Keep it simple**: Never parse the `message` field if you're going to store or forward it. Pass the bytes through untouched.
 ## Encryption
 
 Selective data sharing is supported through public and protected measurement sections.
