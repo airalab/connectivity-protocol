@@ -9,9 +9,9 @@
 
 ```
 ┌────────────┐                ┌─────────────────┐              ┌─────────────────┐
-│  IoT       │   Signed       │  Connectivity   │              │  Backend/Map    │
+│  IoT       │   Signed       │  Connectivity   │   Signed     │  Backend/Map    │
 │  Sensor    │──────────────> │  Layer          │────────────> │  Infrastructure │
-│  Device    │   Envelope     │  (Pass-through) │              │                 │
+│  Device    │   Envelope     │  (Pass-through) │   Envelope   │                 │
 └────────────┘                └─────────────────┘              └─────────────────┘
      │                              │                                  │
      │ Measures                     │ Validates                        │ Decodes
@@ -69,6 +69,35 @@ Telemetry message wrapped in a `SignedEnvelope` that provides:
 - **`signature`** — Ed25519 signature
 - **`message`** — The actual measurements data
 
+### Signature & Byte Integrity
+
+**The signature is computed over the exact bytes of the envelope fields.**
+
+**DO NOT** re-encode envelope. Protobuf serialization is **not deterministic** — re-encoding may produces different bytes, which:
+1. **Breaks the signature** (validation will fail)
+2. **Changes the CID** (IPFS hash won't match datalog record)
+
+### Implementation Rule
+
+| Layer | Operation | Safe? |
+|-------|-----------|-------|
+| **Device** | Serialize once, sign, transmit | ✅ |
+| **Connectivity** | Verify signature, forward raw envelope | ✅ |
+| **Backend** | Deserialize for indexing, store original bytes | ✅ |
+| **Any layer** | Decode `message` + re-encode | ❌ **Breaks signature & CID** |
+
+### Verification
+
+If you must test serialization code:
+
+```bash
+# Signature validation is the primary check
+verify_ed25519(envelope.signature, envelope.message, device_pubkey)
+# ✅ Pass = bytes unchanged
+# ❌ Fail = bytes were modified (re-encoded)
+```
+
+**Keep it simple**: Never parse the `message` field if you're going to store or forward it. Pass the bytes through untouched.
 ## Encryption
 
 Selective data sharing is supported through public and protected measurement sections.
@@ -216,7 +245,7 @@ Protobuf supports **zero-copy pass-through** at the connectivity layer:
 │  ┌────────────────────────────────────────────┐                     │
 │  │ 1. Verify Ed25519 signature    ✓           │                     │
 │  │ 2. Check timestamp freshness   ✓           │                     │
-│  │ 3. Forward envelop             →           │  (No parsing!)      │
+│  │ 3. Forward envelope            →           │  (No parsing!)      │
 │  │                                            │                     │
 │  │ ❌ Does NOT decode Message                 │                     │
 │  │ ❌ Does NOT parse measurements             │                     │
@@ -225,7 +254,7 @@ Protobuf supports **zero-copy pass-through** at the connectivity layer:
 │                         ▼                                           │
 │  BACKEND/MAP (Full Processing)                                      │
 │  ┌────────────────────────────────────────────┐                     │
-│  │ 1. Deserialize Message                     │                     │
+│  │ 1. Deserialize envelope and message        │                     │
 │  │ 2. Extract metadata                        │                     │
 │  │ 3. Process public measurements             │                     │
 │  │ 4. Try decrypt protected sections          │                     │
