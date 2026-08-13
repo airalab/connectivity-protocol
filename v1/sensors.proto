@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package sensors.social.v1;
+
+import "measurements.proto";
+
+message BME680 {
+  Temperature temperature = 1;
+  Humidity humidity = 2;
+  Pressure pressure = 3;
+}
+
+message SCD41 {
+  CO2 co2 = 1;
+  Temperature temperature = 2;
+}
+
+message BME280 {
+  Temperature temperature = 1;
+  Humidity humidity = 2;
+  Pressure pressure = 3;
+}
+
+message SDS011 {
+  PM25 pm25 = 1;
+  PM10 pm10 = 2;
+}
+
+message ICS43434 {
+  NoiseLevel noise_max = 1;
+  NoiseLevel noise_avg = 2;
+}
