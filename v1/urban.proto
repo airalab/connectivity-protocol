@@ -3,76 +3,27 @@ syntax = "proto3";
 package sensors.social.v1;
 
 import "common.proto";
+import "sensors.proto";
+import "measurements.proto";
 
 // Urban (outdoor) sensor telemetry.
 // Designed for outdoor environmental monitoring stations measuring
 // air quality, noise pollution, weather conditions, and radiation.
 
 // Urban board sensors.
-// All fields are optional (proto3 semantics: 0/empty = not measured/not available).
+// Each event carries one sensor-specific payload.
 message Urban {
   oneof sensor {
-    // Particulate Matter ≤10µm in micrograms per cubic meter (PM10)
-    // Typical range: 0-500 µg/m³, values >150 indicate unhealthy air
-    double pm10_ug_m3 = 1;
-
-    // Particulate Matter ≤2.5µm in micrograms per cubic meter (PM2.5)
-    // Typical range: 0-300 µg/m³, values >35 indicate unhealthy air
-    double pm25_ug_m3 = 2;
-
-    // Maximum noise level in decibels (dB), A-weighted
-    // Peak sound pressure level recorded during measurement period
-    double noise_max_db = 3;
-
-    // Average noise level in decibels (dB), A-weighted
-    // Mean sound pressure level over measurement period
-    double noise_avg_db = 4;
-
-    // Ambient air temperature in degrees Celsius
-    // Typical range: -40°C to +60°C for outdoor sensors
-    double temperature_c = 5;
-
-    // Relative humidity as percentage (0-100%)
-    // Typical range: 10-100% RH
-    double humidity_pct = 6;
-
-    // Atmospheric pressure in Pascals
-    // Typical range: 95000-105000 Pa (950-1050 hPa at sea level)
-    // Note: Store raw Pascals; UI converts to mmHg (×0.00750062) if needed
-    double pressure_pa = 7;
-
-    // Ionizing radiation dose rate in microroentgens per hour (µR/h)
-    // Measured by RadSens or similar sensors
-    // Typical background: 10-20 µR/h; values >50 warrant attention
-    double radiation_ur_h = 8;
-
-    // Carbon monoxide concentration in parts per million (ppm)
-    // Typical range: 0-50 ppm; values >9 ppm are hazardous
-    double co = 9;
-
-    // Ozone concentration in parts per billion (ppb)
-    // Typical range: 0-200 ppb; values >70 ppb indicate poor air quality
-    double o3 = 10;
-
-    // Nitrogen dioxide concentration in parts per billion (ppb)
-    // Typical range: 0-200 ppb; values >100 ppb indicate poor air quality
-    double no2 = 11;
-
-    // Fast AQI (Air Quality Index), dimensionless
-    // Device-computed air quality index, algorithm-specific
-    double fast_aqi = 12;
-
-    // EPA AQI (US Environmental Protection Agency Air Quality Index)
-    // Standardized 0-500 scale: 0-50=Good, 51-100=Moderate, 101-150=Unhealthy for Sensitive Groups,
-    // 151-200=Unhealthy, 201-300=Very Unhealthy, 301-500=Hazardous
-    double epa_aqi = 13;
-
-    // Geographic location
-    Location location = 14;
+    BME280 bme280 = 1;
+    SDS011 sds011 = 2;
+    ICS43434 ics43434 = 3;
+    AirQualityIndex fast_aqi = 4;
+    AirQualityIndex epa_aqi = 5;
+    GPS gps = 6;
   }
 }
 
-// Protected measurements, encrypted data serialized using this message 
+// Protected measurements, encrypted data serialized using this message
 message UrbanProtected {
   // Protected measurements, used for encryption
   repeated Urban protected = 1;
@@ -82,7 +33,7 @@ message UrbanProtected {
 message UrbanPayload {
   // Public measurements visible to everyone
   repeated Urban public = 1;
- 
+
   // Protected (encrypted) measurement sections, each for a different recipient
   // Allows sharing different subsets of measurements with different users
   repeated EncryptedData protected = 2;
