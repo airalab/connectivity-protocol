@@ -1,10 +1,9 @@
 syntax = "proto3";
 
-package sensors.social.v1;
+package device.v1;
 
-import "encrypted.proto";
-import "sensors.proto";
-import "measurements.proto";
+import "crypto/v1/encrypted.proto";
+import "sensor/v1/sensor.proto";
 
 // Urban (outdoor) sensor telemetry.
 // Designed for outdoor environmental monitoring stations measuring
@@ -12,29 +11,27 @@ import "measurements.proto";
 
 // Urban board sensors.
 // Each event carries one sensor-specific payload.
-message Urban {
+message UrbanSensor {
   oneof sensor {
-    BME280 bme280 = 1;
-    SDS011 sds011 = 2;
-    ICS43434 ics43434 = 3;
-    AirQualityIndex fast_aqi = 4;
-    AirQualityIndex epa_aqi = 5;
-    GPS gps = 6;
+    sensor.v1.GPS gps = 1;
+    sensor.v1.BME280 bme280 = 2;
+    sensor.v1.SDS011 sds011 = 3;
+    sensor.v1.ICS43434 ics43434 = 4;
   }
 }
 
 // Protected measurements, encrypted data serialized using this message
 message EncryptedUrban {
   // Measurements for encryption 
-  repeated Urban measurements = 1;
+  repeated UrbanSensor sensors = 1;
 }
 
-// Urban payload with public/encrypted data sharing.
-message UrbanPayload {
+// Urban payload with public/private data sharing.
+message Urban {
   // Public measurements visible to everyone
-  repeated Urban public = 1;
+  repeated UrbanSensor public = 1;
 
   // Encrypted measurements sections, each for a different recipient
   // Allows sharing different subsets of measurements with different users
-  repeated Encrypted encrypted = 2;
+  repeated crypto.v1.Encrypted private = 2;
 }

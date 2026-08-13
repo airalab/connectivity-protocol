@@ -1,10 +1,9 @@
 syntax = "proto3";
 
-package sensors.social.v1;
+package core.v1;
 
-import "common.proto";
-import "urban.proto";
-import "insight.proto";
+import "device/v1/urban.proto";
+import "device/v1/insight.proto";
 
 // Top-level message structure
 // This is the root message type exchanged between firmware, connectivity layer,
@@ -28,9 +27,9 @@ message Message {
   // Device measurements.
   oneof payload {
     // Outdoor/urban environmental monitoring
-    UrbanPayload urban = 2;
+    device.v1.Urban urban = 2;
     
     // Indoor environmental monitoring
-    InsightPayload insight = 3;
+    device.v1.Insight insight = 3;
   }
 }

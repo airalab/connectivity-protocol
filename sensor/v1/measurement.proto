@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package sensors.social.v1;
+package sensor.v1;
 
 // Ambient or surface temperature.
 // Unit: degrees Celsius (°C).

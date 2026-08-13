@@ -40,7 +40,7 @@
 │  │  │ Temp: 21°C │ │ PM2.5: 8.1 │ │ Location   │  ...          │   │
 │  │  └────────────┘ └────────────┘ └────────────┘               │   │
 │  │                                                             │   │
-│  │  Protected Data (encrypted for specific recipients)         │   │
+│  │  Private Data (encrypted for specific recipients)           │   │
 │  │  ┌──────────────────────────────────────────┐               │   │
 │  │  │ 🔒 Encrypted for City Authority          │               │   │
 │  │  │    Contains: Noise levels, detailed GPS  │               │   │
@@ -90,7 +90,7 @@ Telemetry message wrapped in a `SignedEnvelope` that provides:
 
 ## Encryption
 
-Selective data sharing is supported through public and protected measurement sections.
+Selective data sharing is supported through public and private measurement sections.
 
 ### Privacy Models
 
@@ -100,7 +100,7 @@ Selective data sharing is supported through public and protected measurement sec
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
 │  Public: [Temp, PM2.5, Location]        🌍 Everyone can see         │
-│  Protected: [ ]                                                     │
+│  Private: [ ]                                                       │
 │                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 
@@ -109,7 +109,7 @@ Selective data sharing is supported through public and protected measurement sec
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
 │  Public: [ ]                                                        │
-│  Protected: [🔒 Encrypted(All sensors)]  🔐 Only owner can see      │
+│  Private: [🔒 Encrypted(All sensors)]  🔐 Only owner can see        │
 │                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 
@@ -118,7 +118,7 @@ Selective data sharing is supported through public and protected measurement sec
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
 │  Public: [Temp, PM2.5, Approx Location]  🌍 Everyone can see        │
-│  Protected: [                                                       │
+│  Private: [                                                         │
 │    🔒 Encrypted(Precise GPS, Noise) → City Authority                │
 │    🔒 Encrypted(All sensors)        → Device Owner                  │
 │  ]                                                                  │
@@ -129,16 +129,16 @@ Selective data sharing is supported through public and protected measurement sec
 ### Data Sharing Model
 
 Sensors can implement flexible privacy by:
-1. **Fully public**: Only populate the `public` array with Urban/Insight messages, leave `protected` empty
-2. **Fully private**: Leave `public` empty, put all measurements in `protected` sections (ciphertext contains serialized UrbanProtected/InsightProtected)
-3. **Mixed sharing**: Share basic metrics publicly, detailed metrics in protected sections
-4. **Multiple recipients**: Create separate protected sections for different users/groups
+1. **Fully public**: Only populate the `public` array with Urban/Insight messages, leave `private` empty
+2. **Fully private**: Leave `public` empty, put all measurements in `private` sections (ciphertext contains serialized EncryptedUrban/EncryptedInsight)
+3. **Mixed sharing**: Share basic metrics publicly, detailed metrics in private sections
+4. **Multiple recipients**: Create separate private sections for different users/groups
 
 ### Encryption Process
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│              How Protected Data is Encrypted                        │
+│              How Private Data is Encrypted                          │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
 │  Step 1: Prepare Measurements                                       │
@@ -146,10 +146,10 @@ Sensors can implement flexible privacy by:
 │  │ Urban: [Noise: 85dB, GPS: (51.5, -0.1)]    │                     │
 │  └────────────────────────────────────────────┘                     │
 │                    ▼                                                │
-│  Step 2: Wrap in UrbanProtected                                     │
+│  Step 2: Wrap in EncryptedUrban                                     │
 │  ┌────────────────────────────────────────────┐                     │
-│  │ UrbanProtected {                           │                     │
-│  │   protected: [Urban, Urban]                │                     │
+│  │ EncryptedUrban {                           │                     │
+│  │   sensors: [UrbanSensor, UrbanSensor]      │                     │
 │  │ }                                          │                     │
 │  └────────────────────────────────────────────┘                     │
 │                    ▼                                                │
@@ -169,9 +169,9 @@ Sensors can implement flexible privacy by:
 │  │ Ciphertext + Auth Tag                      │  🔒 Encrypted       │
 │  └────────────────────────────────────────────┘                     │
 │                    ▼                                                │
-│  Step 6: Add to Protected Section                                   │
+│  Step 6: Add to Private Section                                     │
 │  ┌────────────────────────────────────────────┐                     │
-│  │ EncryptedData {                            │                     │
+│  │ Encrypted {                                │                     │
 │  │   version: 1                               │                     │
 │  │   algorithm: "xchacha20"                   │                     │
 │  │   from: <sensor_pubkey>                    │                     │
@@ -183,7 +183,7 @@ Sensors can implement flexible privacy by:
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **Create wrapper**: Place Urban/Insight measurements in UrbanProtected/InsightProtected wrapper
+1. **Create wrapper**: Place Urban/Insight measurements in EncryptedUrban/EncryptedInsight wrapper
 2. **Serialize**: Convert wrapper to protobuf binary format
 3. **Key Agreement**: ECDH between sender's private key and recipient's public key (from `meta.owner`)
 4. **Key Derivation**: HKDF-SHA256 to derive encryption key from shared secret
@@ -204,7 +204,7 @@ Sensors can implement flexible privacy by:
 
 Revocation only applies going forward.
 
-A protected section, once published, is stored in IPFS and its hash is anchored in the
+A private section, once published, is stored in IPFS and its hash is anchored in the
 chain. A recipient who held the key keeps everything they were able to decrypt up to the
 moment access was taken back. Rotating keys or dropping a recipient from future messages
 withdraws access to what comes next — not to what has already been released.
@@ -247,7 +247,7 @@ Protobuf supports **zero-copy pass-through** at the connectivity layer:
 │  │ 1. Deserialize envelope and message        │                     │
 │  │ 2. Extract metadata                        │                     │
 │  │ 3. Process public measurements             │                     │
-│  │ 4. Try decrypt protected sections          │                     │
+│  │ 4. Try decrypt private sections            │                     │
 │  │ 5. Store in database                       │                     │
 │  │ 6. Update map visualization                │                     │
 │  └────────────────────────────────────────────┘                     │

@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package sensors.social.v1;
+package sensor.v1;
 
-import "measurements.proto";
+import "sensor/v1/measurement.proto";
 
 // Bosch BME680 environmental sensor.
 // Datasheet: https://www.bosch-sensortec.com/products/environmental-sensors/gas-sensors/bme680/
