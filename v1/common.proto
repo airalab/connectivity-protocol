@@ -6,12 +6,16 @@ package sensors.social.v1;
 // Schema version: v1 (2024-08-06)
 
 // Non-measurement metadata.
-// Contains device ownership and attribution information, not sensor readings.
+// Contains device ownership and user-provided context.
 message Meta {
   // Sensor owner address.
   // Used on the map for grouping sensors by owner.
   // Note: In JSON encoded as base58 format (Robonomics SS58 address)
   bytes owner = 1;
+
+  // User-provided location context for a device.
+  // For direct GPS telemetry, add a dedicated GPS sensor payload type.
+  Location location = 2;
 }
 
 // GPS / map coordinates (shared by all sensor types).
