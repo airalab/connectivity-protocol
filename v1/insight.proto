@@ -15,6 +15,7 @@ message Insight {
   oneof sensor {
     BME680 bme680 = 1;
     SCD41 scd41 = 2;
+    GPS gps = 3;
   }
 }
 

@@ -12,23 +12,6 @@ message Meta {
   // Used on the map for grouping sensors by owner.
   // Note: In JSON encoded as base58 format (Robonomics SS58 address)
   bytes owner = 1;
-
-  // User-provided location context for a device.
-  // For direct GPS telemetry, add a dedicated GPS sensor payload type.
-  Location location = 2;
-}
-
-// GPS / map coordinates (shared by all sensor types).
-// Uses WGS84 datum for geographic positioning with optional elevation data.
-message Location {
-  // Latitude in decimal degrees, range: -90.0 to +90.0 (WGS84)
-  double lat = 1;
-  
-  // Longitude in decimal degrees, range: -180.0 to +180.0 (WGS84)
-  double lon = 2;
-  
-  // Height above mean sea level in meters (optional, 0 if not available)
-  double height_m = 3;
 }
 
 // Encrypted data following Robonomics CPS encryption format.

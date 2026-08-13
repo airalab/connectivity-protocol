@@ -19,6 +19,7 @@ message Urban {
     ICS43434 ics43434 = 3;
     AirQualityIndex fast_aqi = 4;
     AirQualityIndex epa_aqi = 5;
+    GPS gps = 6;
   }
 }
 

@@ -55,3 +55,17 @@ message ICS43434 {
     NoiseLevel noise_avg = 2;
   }
 }
+
+// Generic GNSS/GPS location sensor payload.
+// Coordinates use WGS84 datum.
+// Measurement period: firmware-defined; payload carries one location fix per event.
+message GPS {
+  // Latitude in decimal degrees, range: -90.0 to +90.0 (WGS84)
+  double lat = 1;
+
+  // Longitude in decimal degrees, range: -180.0 to +180.0 (WGS84)
+  double lon = 2;
+
+  // Height above mean sea level in meters (optional, 0 if not available)
+  double height_m = 3;
+}
