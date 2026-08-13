@@ -5,20 +5,11 @@ package sensors.social.v1;
 // Common types shared across all message schemas.
 // Schema version: v1 (2024-08-06)
 
-// Non-measurement metadata.
-// Contains device ownership and user-provided context.
-message Meta {
-  // Sensor owner address.
-  // Used on the map for grouping sensors by owner.
-  // Note: In JSON encoded as base58 format (Robonomics SS58 address)
-  bytes owner = 1;
-}
-
-// Encrypted data following Robonomics CPS encryption format.
+// Encrypted message following Robonomics CPS encryption format.
 // Uses AEAD (Authenticated Encryption with Associated Data) to ensure
 // confidentiality and integrity of sensor measurements.
 // Based on: https://github.com/airalab/robonomics/blob/master/frame/cps/README.md#-encryption-format
-message EncryptedData {
+message Encrypted {
   // Encryption protocol version (currently always 1)
   uint32 version = 1;
   
@@ -30,19 +21,16 @@ message EncryptedData {
   
   // Sender's public key.
   // Used for ECDH key agreement to derive the encryption key.
-  // Note: In JSON encoded as base58 format (Robonomics SS58 address)
   bytes from = 3;
   
   // Random nonce/initialization vector:
   // - XChaCha20: 24 bytes (192 bits)
   // - AES-GCM/ChaCha20: 12 bytes (96 bits)
   // Must be unique for each message encrypted with the same key.
-  // Note: In JSON encoded as base64 format
   bytes nonce = 4;
   
   // AEAD ciphertext including the authentication tag.
   // Contains the encrypted protobuf-serialized payload (UrbanProtected or InsightProtected)
   // plus a 16-byte Poly1305/GCM authentication tag appended.
-  // Note: In JSON encoded as base64 format
   bytes ciphertext = 5;
 }

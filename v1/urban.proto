@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package sensors.social.v1;
 
-import "common.proto";
+import "encrypted.proto";
 import "sensors.proto";
 import "measurements.proto";
 
@@ -24,17 +24,17 @@ message Urban {
 }
 
 // Protected measurements, encrypted data serialized using this message
-message UrbanProtected {
-  // Protected measurements, used for encryption
-  repeated Urban protected = 1;
+message EncryptedUrban {
+  // Measurements for encryption 
+  repeated Urban measurements = 1;
 }
 
-// Urban payload with public/protected data sharing.
+// Urban payload with public/encrypted data sharing.
 message UrbanPayload {
   // Public measurements visible to everyone
   repeated Urban public = 1;
 
-  // Protected (encrypted) measurement sections, each for a different recipient
+  // Encrypted measurements sections, each for a different recipient
   // Allows sharing different subsets of measurements with different users
-  repeated EncryptedData protected = 2;
+  repeated Encrypted encrypted = 2;
 }

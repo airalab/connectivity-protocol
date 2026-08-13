@@ -66,25 +66,27 @@ Telemetry message wrapped in a `SignedEnvelope` that provides:
 - **`sensor_id`** — Unique device identifier (persistent across restarts)
 - **`timestamp`** — UTC timestamp when measurement was taken (ISO 8601 format)
 - **`nonce`** — Random value to prevent replay attacks (e.g., UUID v4)
-- **`signature`** — Ed25519 signature
 - **`message`** — The actual measurements data
+- **`signature`** — Ed25519 signature
 
 ### Signature & Byte Integrity
 
 **The signature is computed over the exact bytes of the envelope fields.**
 
+    singature = sing(**sensor_id** <> **timestamp** <> **nonce** <> **message**)
+
 **DO NOT** re-encode envelope. Protobuf serialization is **not deterministic** — re-encoding may produces different bytes, which:
 1. **Breaks the signature** (validation will fail)
 2. **Changes the CID** (IPFS hash won't match datalog record)
 
-### Implementation Rule
+#### Quick Implementation Rules
 
 | Layer | Operation | Safe? |
 |-------|-----------|-------|
 | **Device** | Serialize once, sign, transmit | ✅ |
-| **Connectivity** | Verify signature, forward raw envelope | ✅ |
+| **Connectivity** | Verify signature, forward envelope | ✅ |
 | **Backend** | Deserialize for indexing, store original bytes | ✅ |
-| **Any layer** | Decode `message` + re-encode | ❌ **Breaks signature & CID** |
+| **Any** | Decode and re-encode | ❌ **May breaks signature & CID** |
 
 ## Encryption
 

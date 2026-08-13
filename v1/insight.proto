@@ -20,9 +20,9 @@ message Insight {
 }
 
 // Protected measurements, encrypted data serialized using this message
-message InsightProtected {
-  // Protected measurements, used for encryption
-  repeated Insight protected = 1;
+message EncryptedInsight {
+  // Measurements for encryption 
+  repeated Insight measurements = 1;
 }
 
 // Insight payload with public/protected data sharing.
@@ -30,7 +30,7 @@ message InsightPayload {
   // Public measurements visible to everyone
   repeated Insight public = 1;
 
-  // Protected (encrypted) measurement sections, each for a different recipient
+  // Encrypted measurement sections, each for a different recipient
   // Allows sharing different subsets of measurements with different users
-  repeated EncryptedData protected = 2;
+  repeated Encrypted encrypted = 2;
 }

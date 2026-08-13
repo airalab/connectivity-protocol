@@ -6,11 +6,18 @@ import "common.proto";
 import "urban.proto";
 import "insight.proto";
 
-// Top-level message structure for connectivity / map
+// Top-level message structure
 // This is the root message type exchanged between firmware, connectivity layer,
 // and the sensors.social map infrastructure.
 //
 // For HTTP transport with connectivity layer, use SignedEnvelope (see envelope.proto).
+
+// Non-measurement metadata.
+message Meta {
+  // Sensor owner public key (32 bytes).
+  // Used on the map for grouping sensors by owner.
+  bytes owner = 1;
+}
 
 // Root telemetry message.
 // Contains metadata and device measurements.
