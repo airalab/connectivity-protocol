@@ -300,7 +300,7 @@ Beyond signed envelope delivery through connectivity layers, measurements can be
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-### Method 1: Direct Anchoring
+#### Method 1: Direct Anchoring
 
 **Device pushes serialized envelope directly to blockchain**
 
@@ -310,62 +310,62 @@ Beyond signed envelope delivery through connectivity layers, measurements can be
 │   📡 IoT Device                                                     │
 │   ┌───────────────────────────────────────────────────────────┐     │
 │   │                                                           │     │
-│   │  1️⃣  Measure                                               ││     │
-│   │     ┌─────────┐                                           │    │
-│   │     │ Temp    │  21.5°C                                   │    │
-│   │     │ PM2.5   │  8.1 µg/m³                               │    │
-│   │     │ GPS     │  (51.5, -0.1)                            │    │
-│   │     └─────────┘                                          │    │
-│   │          │                                               │    │
-│   │          ▼                                               │    │
-│   │  2️⃣  Create SignedEnvelope                               │    │
-│   │     ┌──────────────────────────────────┐                │    │
-│   │     │ sensor_id:  0x4c7f...           │                │    │
-│   │     │ timestamp:  1723537200000        │                │    │
-│   │     │ nonce:      0xf3a9...           │                │    │
-│   │     │ message:    [proto bytes]        │                │    │
-│   │     │ signature:  0x8b2d... (64 bytes) │                │    │
-│   │     └──────────────────────────────────┘                │    │
-│   │          │                                               │    │
-│   │          ▼                                               │    │
-│   │  3️⃣  Serialize to bytes                                  │    │
-│   │     [0x0a, 0x20, 0x4c, 0x7f, ...]  (~200 bytes)         │    │
-│   │          │                                               │    │
-│   └──────────┼───────────────────────────────────────────────┘    │
-│              │                                                    │
-│              │ Submit Extrinsic                                   │
-│              ▼                                                    │
-│   ⛓️  Robonomics Blockchain                                       │
-│   ┌───────────────────────────────────────────────────────────┐   │
-│   │                                                           │   │
-│   │  pallet_cps::set_payload(                                      │   │
-│   │    origin: Signed(device_account),                        │   │
-│   │    payload: [0x0a, 0x20, 0x4c, ...]  ← Full envelope     │   │
-│   │  )                                                        │   │
-│   │                                                           │   │
-│   │  ┌─────────────────────────────────────────────────┐     │   │
-│   │  │  Block #2847593                                 │     │   │
-│   │  │  ┌───────────────────────────────────────────┐  │     │   │
-│   │  │  │ Extrinsic: CPS.record                     │  │     │   │
-│   │  │  │ Account: 4CvP46mxFm54eBb...              │  │     │   │
-│   │  │  │ Payload: [0x0a, 0x20, 0x4c, ...] 200 B   │  │     │   │
-│   │  │  │ Timestamp: 2026-08-13 09:36:00 UTC       │  │     │   │
-│   │  │  └───────────────────────────────────────────┘  │     │   │
-│   │  └─────────────────────────────────────────────────┘     │   │
-│   │                                                           │   │
-│   │  ✅ Stored on-chain forever                               │   │
-│   │  ✅ Immutable timestamp                                   │   │
-│   │  ✅ Immediate finality                                    │   │
-│   │                                                           │   │
-│   └───────────────────────────────────────────────────────────┘   │
-│                                                                    │
-│   💰 Cost: ~0.001 XRT per envelope (~200 bytes storage)           │
-│   ⏱️  Latency: 6-12 seconds                                        │
-│                                                                    │
+│   │  1️⃣  Measure                                              │     │
+│   │     ┌─────────┐                                           │     │
+│   │     │ Temp    │  21.5°C                                   │     │
+│   │     │ PM2.5   │  8.1 µg/m³                                │     │
+│   │     │ GPS     │  (51.5, -0.1)                             │     │
+│   │     └─────────┘                                           │     │
+│   │          │                                                │     │
+│   │          ▼                                                │     │
+│   │  2️⃣  Create SignedEnvelope                                │     │
+│   │     ┌──────────────────────────────────┐                  │     │
+│   │     │ sensor_id:  0x4c7f...            │                  │     │
+│   │     │ timestamp:  1723537200000        │                  │     │
+│   │     │ nonce:      0xf3a9...            │                  │     │
+│   │     │ message:    [proto bytes]        │                  │     │
+│   │     │ signature:  0x8b2d... (64 bytes) │                  │     │
+│   │     └──────────────────────────────────┘                  │     │
+│   │          │                                                │     │
+│   │          ▼                                                │     │
+│   │  3️⃣  Serialize to bytes                                   │     │
+│   │     [0x0a, 0x20, 0x4c, 0x7f, ...]  (~200 bytes)           │     │
+│   │          │                                                │     │
+│   └──────────┼────────────────────────────────────────────────┘     │
+│              │                                                      │
+│              │ Submit Extrinsic                                     │
+│              ▼                                                      │
+│   ⛓️  Robonomics Blockchain                                         │
+│   ┌───────────────────────────────────────────────────────────┐     │
+│   │                                                           │     │
+│   │  pallet_cps::set_payload(                                 │     │
+│   │    origin: Signed(device_account),                        │     │
+│   │    payload: [0x0a, 0x20, 0x4c, ...]  ← Full envelope      │     │
+│   │  )                                                        │     │
+│   │                                                           │     │
+│   │  ┌─────────────────────────────────────────────────┐      │     │
+│   │  │  Block #2847593                                 │      │     │
+│   │  │  ┌───────────────────────────────────────────┐  │      │     │
+│   │  │  │ Extrinsic: CPS.record                     │  │      │     │
+│   │  │  │ Account: 4CvP46mxFm54eBb...               │  │      │     │
+│   │  │  │ Payload: [0x0a, 0x20, 0x4c, ...] 200 B    │  │      │     │
+│   │  │  │ Timestamp: 2026-08-13 09:36:00 UTC        │  │      │     │
+│   │  │  └───────────────────────────────────────────┘  │      │     │
+│   │  └─────────────────────────────────────────────────┘      │     │
+│   │                                                           │     │
+│   │  ✅ Stored on-chain forever                               │     │
+│   │  ✅ Immutable timestamp                                   │     │
+│   │  ✅ Immediate finality                                    │     │
+│   │                                                           │     │
+│   └───────────────────────────────────────────────────────────┘     │
+│                                                                     │
+│   💰 Cost: ~0.001 XRT per envelope (~200 bytes storage)             │
+│   ⏱️  Latency: 6-12 seconds                                         │
+│                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-### Method 2: Batch Anchoring
+#### Method 2: Batch Anchoring
 
 **Service collects envelopes, compresses, stores in IPFS, anchors CID**
 
@@ -373,87 +373,87 @@ Beyond signed envelope delivery through connectivity layers, measurements can be
 ┌─────────────────────────────────────────────────────────────────────┐
 │                                                                     │
 │   📡 Multiple Devices                                               │
-│   ┌──────────┐  ┌──────────┐  ┌──────────┐                         │
-│   │ Sensor 1 │  │ Sensor 2 │  │ Sensor N │                         │
-│   └────┬─────┘  └────┬─────┘  └────┬─────┘                         │
+│   ┌──────────┐  ┌──────────┐  ┌──────────┐                          │
+│   │ Sensor 1 │  │ Sensor 2 │  │ Sensor N │                          │
+│   └────┬─────┘  └────┬─────┘  └────┬─────┘                          │
 │        │ Envelope₁   │ Envelope₂   │ EnvelopeN                      │
-│        └─────────────┴─────────────┘                               │
+│        └─────────────┴─────────────┘                                │
 │                      │                                              │
 │                      ▼                                              │
 │   🌐 Connectivity Service                                           │
-│   ┌───────────────────────────────────────────────────────────┐    │
-│   │                                                           │    │
-│   │  1️⃣  Collect envelopes (e.g., 100 messages)              │    │
-│   │     ┌─────┐ ┌─────┐       ┌─────┐                        │    │
-│   │     │ E₁  │ │ E₂  │  ...  │ E₁₀₀│                        │    │
-│   │     └─────┘ └─────┘       └─────┘                        │    │
-│   │          │                                                │    │
-│   │          ▼                                                │    │
-│   │  2️⃣  Create SignedEnvelopeBatch                          │    │
-│   │     ┌──────────────────────────────────┐                 │    │
-│   │     │ batch: [                         │                 │    │
-│   │     │   SignedEnvelope { ... },        │                 │    │
-│   │     │   SignedEnvelope { ... },        │                 │    │
-│   │     │   ...                            │                 │    │
-│   │     │   SignedEnvelope { ... }         │                 │    │
-│   │     │ ]                                │                 │    │
-│   │     └──────────────────────────────────┘                 │    │
-│   │          │                                                │    │
-│   │          ▼                                                │    │
-│   │  3️⃣  Serialize to protobuf                               │    │
-│   │     [0x0a, 0xc8, 0x01, ...]  (~20 KB for 100)           │    │
-│   │          │                                                │    │
-│   │          ▼                                                │    │
-│   │  4️⃣  Compress with zlib                                  │    │
-│   │     [0x78, 0x9c, 0xed, ...]  (~8 KB, 60% reduction)     │    │
-│   │          │                                                │    │
-│   └──────────┼────────────────────────────────────────────────┘    │
-│              │ Store                                               │
-│              ▼                                                     │
+│   ┌───────────────────────────────────────────────────────────┐     │
+│   │                                                           │     │
+│   │  1️⃣  Collect envelopes (e.g., 100 messages)               │     │
+│   │     ┌─────┐ ┌─────┐       ┌─────┐                         │     │
+│   │     │ E₁  │ │ E₂  │  ...  │ E₁₀₀│                         │     │
+│   │     └─────┘ └─────┘       └─────┘                         │     │
+│   │          │                                                │     │
+│   │          ▼                                                │     │
+│   │  2️⃣  Create SignedEnvelopeBatch                           │     │
+│   │     ┌──────────────────────────────────┐                  │     │
+│   │     │ batch: [                         │                  │     │
+│   │     │   SignedEnvelope { ... },        │                  │     │
+│   │     │   SignedEnvelope { ... },        │                  │     │
+│   │     │   ...                            │                  │     │
+│   │     │   SignedEnvelope { ... }         │                  │     │
+│   │     │ ]                                │                  │     │
+│   │     └──────────────────────────────────┘                  │     │
+│   │          │                                                │     │
+│   │          ▼                                                │     │
+│   │  3️⃣  Serialize to protobuf                                │     │
+│   │     [0x0a, 0xc8, 0x01, ...]  (~20 KB for 100)             │     │
+│   │          │                                                │     │
+│   │          ▼                                                │     │
+│   │  4️⃣  Compress with zlib                                   │     │
+│   │     [0x78, 0x9c, 0xed, ...]  (~8 KB, 60% reduction)       │     │
+│   │          │                                                │     │
+│   └──────────┼────────────────────────────────────────────────┘     │
+│              │ Store                                                │
+│              ▼                                                      │
 │   📦 IPFS Storage                                                   │
-│   ┌───────────────────────────────────────────────────────────┐    │
-│   │                                                           │    │
-│   │  ipfs.add(compressed_batch)                               │    │
-│   │                                                           │    │
-│   │  ┌─────────────────────────────────────────────────┐     │    │
-│   │  │  CID: bafybeigdyrzt5sfp7udm7hu76uh7y26nf...    │     │    │
-│   │  │                                                 │     │    │
-│   │  │  Content: [0x78, 0x9c, 0xed, ...] (8 KB)      │     │    │
-│   │  │                                                 │     │    │
-│   │  │  Contains: 100 signed envelopes                │     │    │
-│   │  └─────────────────────────────────────────────────┘     │    │
-│   │                                                           │    │
-│   └───────────────────────────────────────────────────────────┘    │
-│              │ Return CID                                          │
-│              ▼                                                     │
-│   ⛓️  Robonomics Blockchain                                        │
-│   ┌───────────────────────────────────────────────────────────┐    │
-│   │                                                           │    │
-│   │  pallet_cps::set_payload(                                      │    │
-│   │    origin: Signed(service_account),                       │    │
-│   │    payload: b"bafybeigdyrzt5sfp7udm7hu..."  ← Just CID   │    │
-│   │  )                                                        │    │
-│   │                                                           │    │
-│   │  ┌─────────────────────────────────────────────────┐     │    │
-│   │  │  Block #2847610                                 │     │    │
-│   │  │  ┌───────────────────────────────────────────┐  │     │    │
-│   │  │  │ Extrinsic: CPS.set_payload │  │     │    │
-│   │  │  │ Account: ConnectivityService              │  │     │    │
-│   │  │  │ Payload: bafybeigdyrzt... (59 B)          │  │     │    │
-│   │  │  │ Batch Size: 100 envelopes                 │  │     │    │
-│   │  │  └───────────────────────────────────────────┘  │     │    │
-│   │  └─────────────────────────────────────────────────┘     │    │
-│   │                                                           │    │
-│   │  ✅ Only CID stored on-chain                              │    │
-│   │  ✅ Batch proof for 100 measurements                      │    │
-│   │  ✅ Cost amortized across batch                           │    │
-│   │                                                           │    │
-│   └───────────────────────────────────────────────────────────┘    │
-│                                                                    │
-│   💰 Cost: ~0.00001 XRT per envelope (100x cheaper)               │
-│   ⏱️  Latency: 30-60 seconds (batch interval)                      │
-│   💾 Storage: IPFS (distributed, needs pinning)                    │
-│                                                                    │
+│   ┌───────────────────────────────────────────────────────────┐     │
+│   │                                                           │     │
+│   │  ipfs.add(compressed_batch)                               │     │
+│   │                                                           │     │
+│   │  ┌─────────────────────────────────────────────────┐      │     │
+│   │  │  CID: bafybeigdyrzt5sfp7udm7hu76uh7y26nf...     │      │     │
+│   │  │                                                 │      │     │
+│   │  │  Content: [0x78, 0x9c, 0xed, ...] (8 KB)        │      │     │
+│   │  │                                                 │      │     │
+│   │  │  Contains: 100 signed envelopes                 │      │     │
+│   │  └─────────────────────────────────────────────────┘      │     │
+│   │                                                           │     │
+│   └───────────────────────────────────────────────────────────┘     │
+│              │ Return CID                                           │
+│              ▼                                                      │
+│   ⛓️  Robonomics Blockchain                                         │
+│   ┌───────────────────────────────────────────────────────────┐     │
+│   │                                                           │     │
+│   │  pallet_cps::set_payload(                                 │     │
+│   │    origin: Signed(service_account),                       │     │
+│   │    payload: b"bafybeigdyrzt5sfp7udm7hu..."  ← Just CID    │     │
+│   │  )                                                        │     │
+│   │                                                           │     │
+│   │  ┌─────────────────────────────────────────────────┐      │     │
+│   │  │  Block #2847610                                 │      │     │
+│   │  │  ┌───────────────────────────────────────────┐  │      │     │
+│   │  │  │ Extrinsic: CPS.set_payload                │  │      │     │
+│   │  │  │ Account: ConnectivityService              │  │      │     │
+│   │  │  │ Payload: bafybeigdyrzt... (59 B)          │  │      │     │
+│   │  │  │ Batch Size: 100 envelopes                 │  │      │     │
+│   │  │  └───────────────────────────────────────────┘  │      │     │
+│   │  └─────────────────────────────────────────────────┘      │     │
+│   │                                                           │     │
+│   │  ✅ Only CID stored on-chain                              │     │
+│   │  ✅ Batch proof for 100 measurements                      │     │
+│   │  ✅ Cost amortized across batch                           │     │
+│   │                                                           │     │
+│   └───────────────────────────────────────────────────────────┘     │
+│                                                                     │
+│   💰 Cost: ~0.00001 XRT per envelope (100x cheaper)                 │
+│   ⏱️  Latency: 30-60 seconds (batch interval)                       │
+│   💾 Storage: IPFS (distributed, needs pinning)                     │
+│                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
