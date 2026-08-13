@@ -15,13 +15,14 @@ message BME680 {
   }
 }
 
-// Sensirion SCD41 photoacoustic CO₂ sensor with temperature output.
+// Sensirion SCD41 photoacoustic CO₂ sensor.
 // Datasheet: https://sensirion.com/products/catalog/SCD41
 // Measurement period: typically 5 s in periodic mode; payload carries one measurement per event.
 message SCD41 {
   oneof measurement {
     CO2 co2 = 1;
     Temperature temperature = 2;
+    Humidity humidity = 3;
   }
 }
 
