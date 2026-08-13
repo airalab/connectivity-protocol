@@ -1,9 +1,10 @@
 version: v2
+modules:
+  - path: .
+    name: buf.build/airalab/sensors-social-proto
 lint:
   use:
     - STANDARD
-  except:
-    - SERVICE_SUFFIX
 breaking:
   use:
     - FILE
