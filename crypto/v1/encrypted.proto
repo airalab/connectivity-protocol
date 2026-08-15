@@ -8,7 +8,7 @@ package crypto.v1;
 // Encrypted message following Robonomics CPS encryption format.
 // Uses AEAD (Authenticated Encryption with Associated Data) to ensure
 // confidentiality and integrity of sensor measurements.
-// Based on: https://github.com/airalab/robonomics/blob/master/frame/cps/README.md#-encryption-format
+// Based on: https://github.com/airalab/robonomics/blob/master/frame/cps/README.md#self-describing-encryption-format
 message Encrypted {
   // Encryption protocol version (currently always 1)
   uint32 version = 1;
