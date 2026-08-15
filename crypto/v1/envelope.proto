@@ -2,11 +2,7 @@ syntax = "proto3";
 
 package crypto.v1;
 
-// SignedEnvelope wraps telemetry messages with connectivity layer metadata.
-// This is the complete HTTP request body format for sensors-connectivity integration.
-// Based on: https://github.com/akagi-dev/sensors-connectivity/blob/main/docs/architecture/integration-guide.md#request-body-schema-normative
-
-// Signed envelope for HTTP transport.
+// Signed envelope for sensor measurements.
 message SignedEnvelope {
   // Sensor's public key (for Ed25519 it's 32 bytes).
   // Used as unique device identifier.
@@ -21,7 +17,6 @@ message SignedEnvelope {
   bytes nonce = 3;
   
   // The actual telemetry as raw protobuf bytes.
-  // Contains serialized metadata and payload.
   // Connectivity layer can pass this through without decoding.
   bytes message = 4;
 
