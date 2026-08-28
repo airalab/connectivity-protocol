@@ -1,4 +1,4 @@
-# Sensors.social Protocol
+# Connectivity Protocol
 
 ## Goals
 
