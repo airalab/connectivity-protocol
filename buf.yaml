@@ -1,7 +1,7 @@
 version: v2
 modules:
   - path: .
-    name: buf.build/airalab/sensors-social-proto
+    name: buf.build/airalab/connectivity-protocol
 lint:
   use:
     - STANDARD
