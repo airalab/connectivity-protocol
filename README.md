@@ -77,7 +77,7 @@ Telemetry message wrapped in a `SignedEnvelope` that provides:
 
 **DO NOT** re-encode envelope. Protobuf serialization is **not deterministic** — re-encoding may produces different bytes, which:
 1. **Breaks the signature** (validation will fail)
-2. **Changes the CID** (IPFS hash won't match datalog record)
+2. **Changes the CID**
 
 #### Quick Implementation Rules
 
@@ -346,7 +346,7 @@ Beyond signed envelope delivery through connectivity layers, measurements can be
 │   │  ┌─────────────────────────────────────────────────┐      │     │
 │   │  │  Block #2847593                                 │      │     │
 │   │  │  ┌───────────────────────────────────────────┐  │      │     │
-│   │  │  │ Extrinsic: CPS.record                     │  │      │     │
+│   │  │  │ Extrinsic: CPS.set_payload                │  │      │     │
 │   │  │  │ Account: 4CvP46mxFm54eBb...               │  │      │     │
 │   │  │  │ Payload: [0x0a, 0x20, 0x4c, ...] 200 B    │  │      │     │
 │   │  │  │ Timestamp: 2026-08-13 09:36:00 UTC        │  │      │     │
