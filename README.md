@@ -29,7 +29,8 @@
 │                                                                    │
 │  Metadata                                                          │
 │  ┌────────────────────────────────────────────┐                    │
-│  │ Owner: 4CvP46mxFm54eBbTMFayHK7...          │                    │
+│  │ node_id: 42                                │                    │
+│  │ timestamp: 1723537200000                   │                    │
 │  └────────────────────────────────────────────┘                    │
 │                                                                    │
 │  Payload (choose one: Urban OR Insight)                            │
@@ -64,16 +65,15 @@ There is no `schema_version` field inside `Message` — the path / `package sens
 
 Telemetry message wrapped in a `SignedEnvelope` that provides:
 - **`sensor_id`** — Unique device identifier (persistent across restarts)
-- **`timestamp`** — UTC timestamp when measurement was taken (ISO 8601 format)
 - **`nonce`** — Random value to prevent replay attacks (e.g., UUID v4)
-- **`message`** — The actual measurements data
+- **`message`** — The actual measurements data, including `Meta.timestamp` (UTC, ms)
 - **`signature`** — Ed25519 signature
 
 ### Signature & Byte Integrity
 
 **The signature is computed over the exact bytes of the envelope fields.**
 
-    singature = sing(**sensor_id** <> **timestamp** <> **nonce** <> **message**)
+    singature = sing(**sensor_id** <> **nonce** <> **message**)
 
 **DO NOT** re-encode envelope. Protobuf serialization is **not deterministic** — re-encoding may produces different bytes, which:
 1. **Breaks the signature** (validation will fail)
@@ -185,7 +185,7 @@ Sensors can implement flexible privacy by:
 
 1. **Create wrapper**: Place Urban/Insight measurements in EncryptedUrban/EncryptedInsight wrapper
 2. **Serialize**: Convert wrapper to protobuf binary format
-3. **Key Agreement**: ECDH between sender's private key and recipient's public key (from `meta.owner`)
+3. **Key Agreement**: ECDH between sender's private key and recipient's public key
 4. **Key Derivation**: HKDF-SHA256 to derive encryption key from shared secret
 5. **AEAD Encryption**: Encrypt serialized protobuf with chosen algorithm
 6. **Authentication**: 16-byte Poly1305 or GCM tag appended to ciphertext
@@ -234,8 +234,7 @@ Protobuf supports **zero-copy pass-through** at the connectivity layer:
 │  CONNECTIVITY LAYER (Pass-through)                                  │
 │  ┌────────────────────────────────────────────┐                     │
 │  │ 1. Verify Ed25519 signature    ✓           │                     │
-│  │ 2. Check timestamp freshness   ✓           │                     │
-│  │ 3. Forward envelope            →           │  (No parsing!)      │
+│  │ 2. Forward envelope            →           │  (No parsing!)      │
 │  │                                            │                     │
 │  │ ❌ Does NOT decode Message                 │                     │
 │  │ ❌ Does NOT parse measurements             │                     │
@@ -321,9 +320,9 @@ Beyond signed envelope delivery through connectivity layers, measurements can be
 │   │  2️⃣  Create SignedEnvelope                                │     │
 │   │     ┌──────────────────────────────────┐                  │     │
 │   │     │ sensor_id:  0x4c7f...            │                  │     │
-│   │     │ timestamp:  1723537200000        │                  │     │
 │   │     │ nonce:      0xf3a9...            │                  │     │
-│   │     │ message:    [proto bytes]        │                  │     │
+│   │     │ message:    [proto bytes,        │                  │     │
+│   │     │              incl. timestamp]    │                  │     │
 │   │     │ signature:  0x8b2d... (64 bytes) │                  │     │
 │   │     └──────────────────────────────────┘                  │     │
 │   │          │                                                │     │
